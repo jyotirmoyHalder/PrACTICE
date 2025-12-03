@@ -38,51 +38,9 @@ struct LoginView: View {
                     .multilineTextAlignment(.center)
                     .padding(.bottom, 80)
                 
-                TextField("Email", text: $emailText)
-                    .focused($focusedField, equals: .email)
-                    .padding()
-                    .background(.secondaryBlue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(!isValidEmail ? .red : focusedField == .email ? .primaryBlue : .white, lineWidth: 3)
-                    )
-                    .padding(.horizontal)
-                    .onChange(of: emailText) { _, newValue in
-                        isValidEmail = Validator.validateEmail(newValue)
-                    }
-                    .padding(.bottom, isValidEmail ? 16 : 0)
-                if !isValidEmail {
-                    HStack {
-                        Text("Your email is not valid")
-                            .foregroundStyle(.red)
-                            .padding(.leading)
-                        Spacer()
-                    }
-                }
+                EmailTextField(emailText: $emailText, isValidEmail: $isValidEmail)
                 
-                SecureField("Password", text: $passwordText)
-                    .focused($focusedField, equals: .password)
-                    .padding()
-                    .background(.secondaryBlue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(!isValidPassword ? .red : focusedField == .password ? .primaryBlue : .white, lineWidth: 3)
-                    )
-                    .padding(.horizontal)
-                    .onChange(of: passwordText) { _, newValue in
-                        isValidPassword = Validator.validatePassword(newValue)
-                    }
-                
-                if !isValidPassword {
-                    HStack {
-                        Text("Your password is not valid")
-                            .foregroundStyle(.red)
-                            .padding(.leading)
-                        Spacer()
-                    }
-                }
+                PasswordTextField(passwordText: $passwordText, isValidPassword: $isValidPassword, validatePassword: Validator.validatePassword, errorText: "Your password is not valid.", placeholder: "Password")
                 
                 HStack {
                     Spacer()
@@ -180,5 +138,76 @@ extension View {
             .padding()
             .background(.lightGray)
             .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+struct EmailTextField: View {
+    @Binding var emailText: String
+    @Binding var isValidEmail: Bool
+    
+    @FocusState var focusedField: FocusedField?
+    
+    var body: some View {
+        VStack {
+            TextField("Email", text: $emailText)
+                .focused($focusedField, equals: .email)
+                .padding()
+                .background(.secondaryBlue)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(!isValidEmail ? .red : focusedField == .email ? .primaryBlue : .white, lineWidth: 3)
+                )
+                .padding(.horizontal)
+                .onChange(of: emailText) { _, newValue in
+                    isValidEmail = Validator.validateEmail(newValue)
+                }
+                .padding(.bottom, isValidEmail ? 16 : 0)
+            if !isValidEmail {
+                HStack {
+                    Text("Your email is not valid")
+                        .foregroundStyle(.red)
+                        .padding(.leading)
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+
+struct PasswordTextField: View {
+    @Binding var passwordText: String
+    @Binding var isValidPassword: Bool
+    let validatePassword: (String) -> Bool
+    let errorText: String
+    let placeholder: String
+    
+    @FocusState var focusedField: FocusedField?
+    
+    var body: some View {
+        VStack {
+            SecureField(placeholder, text: $passwordText)
+                .focused($focusedField, equals: .password)
+                .padding()
+                .background(.secondaryBlue)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(!isValidPassword ? .red : focusedField == .password ? .primaryBlue : .white, lineWidth: 3)
+                )
+                .padding(.horizontal)
+                .onChange(of: passwordText) { _, newValue in
+                    isValidPassword = validatePassword(newValue)
+                }
+            
+            if !isValidPassword {
+                HStack {
+                    Text(errorText)
+                        .foregroundStyle(.red)
+                        .padding(.leading)
+                    Spacer()
+                }
+            }
+        }
     }
 }
