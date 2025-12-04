@@ -195,6 +195,9 @@
 			);
 			mainGroup = B23A620E2EE0839700E52DD3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B23A625F2EE1EFF100E52DD3 /* XCRemoteSwiftPackageReference "starter-for-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B23A62182EE0839700E52DD3 /* Products */;
 			projectDirPath = "";
@@ -570,6 +573,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B23A625F2EE1EFF100E52DD3 /* XCRemoteSwiftPackageReference "starter-for-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appwrite/starter-for-ios";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = B23A620F2EE0839700E52DD3 /* Project object */;
 }

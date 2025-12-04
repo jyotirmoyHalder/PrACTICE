@@ -63,7 +63,7 @@ struct RegistrationView: View {
                 Button {
                     //action
                 } label: {
-                    Text("Create new account")
+                    Text("Already have an account")
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(.customGray)
                 }
