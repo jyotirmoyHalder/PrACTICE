@@ -72,7 +72,7 @@ func printWeightedGraph() {
 
     // Print the graph
     let vertices = graph.getVertices()
-    for i in 1...vertices.count {
+    for i in 0..<vertices.count {
         let neighbors = vertices[i].map { String($0.getDestination()) }.joined(separator: " ")
         print("Vertex \(i) is connected to: \(neighbors)")
     }
@@ -161,3 +161,132 @@ public class MinimumSpanningTree {
     }
 }
 
+public class DijkstraShortestPath {
+
+    // Returns array of shortest distances from source to every vertex (1-based indexing safe)
+    // Mirrors the Java approach using a priority queue of GraphEdge prioritized by cumulative weight
+    public func dijkstraShortestPath(graph: WeightedGraph, source: Int) -> [Int] {
+        let verticesAdj = graph.getVertices() // [[GraphEdge]] (0..n)
+        let n = graph.vertices
+        if n <= 0 { return [] }
+
+        // Use Int.max to represent infinity
+        var distance = Array(repeating: Int.max, count: n + 1) // 1-based safe guard
+
+        // Min-heap by edge weight (cumulative)
+        var pq = PriorityQueue<GraphEdge>(sort: { $0.getWeight() < $1.getWeight() })
+
+        // Clamp source to [1, n] since this graph is used as 1-based elsewhere in this file
+        let s = max(1, min(source, n))
+        distance[s] = 0
+        pq.push(GraphEdge(s, s, 0))
+
+        while let currentEdge = pq.pop() {
+            let u = currentEdge.getDestination() // like Java: destination is the vertex being expanded
+
+            // If we popped an entry with a weight larger than our best-known, skip (stale heap entry)
+            if currentEdge.getWeight() > distance[u] { continue }
+
+            if u < verticesAdj.count {
+                for edge in verticesAdj[u] {
+                    // edge: u -> v with edge.getWeight() cost
+                    let v = edge.getDestination()
+                    if distance[u] == Int.max { continue }
+                    let newDistance = distance[u] + edge.getWeight()
+                    if newDistance < distance[v] {
+                        distance[v] = newDistance
+                        // push cumulative weight to v
+                        pq.push(GraphEdge(edge.getSource(), edge.getDestination(), newDistance))
+                    }
+                }
+            }
+        }
+
+        return distance
+    }
+}
+
+// Example runner mirroring the Java main (uses 1-based vertices here for consistency with other examples)
+func demoDijkstra() {
+    let graph = WeightedGraph(vertices: 6)
+    graph.addUndirectedEdge(source: 1, destination: 2, weight: 4)
+    graph.addUndirectedEdge(source: 1, destination: 3, weight: 4)
+    graph.addUndirectedEdge(source: 2, destination: 3, weight: 2)
+    graph.addUndirectedEdge(source: 2, destination: 4, weight: 3)
+    graph.addUndirectedEdge(source: 2, destination: 6, weight: 6)
+    graph.addUndirectedEdge(source: 2, destination: 5, weight: 1)
+    graph.addUndirectedEdge(source: 4, destination: 6, weight: 2)
+    graph.addUndirectedEdge(source: 5, destination: 6, weight: 3)
+
+    let dsp = DijkstraShortestPath()
+    let distances = dsp.dijkstraShortestPath(graph: graph, source: 1)
+    // Print distances (indices 1...n)
+    for i in 1...graph.vertices {
+        let d = distances[i]
+        if d == Int.max {
+            print("Vertex \(i): unreachable")
+        } else {
+            print("Vertex \(i): \(d)")
+        }
+    }
+}
+
+public class GraphColoring {
+    // Returns a map (dictionary) from vertex -> color (1, 2, 3, ...)
+    public func colorGraph(graph: WeightedGraph) -> [Int: Int] {
+        let verticesAdj = graph.getVertices() // [[GraphEdge]]
+        var colorMap: [Int: Int] = [:]
+
+        // Iterate 1...n (skip 0th bucket)
+        let n = graph.vertices
+        guard n >= 1 else { return [:] }
+
+        for vertex in 1...n {
+            if vertex >= verticesAdj.count { continue }
+
+            // Gather neighbor colors
+            var neighborColors = Set<Int>()
+            for edge in verticesAdj[vertex] {
+                if let c = colorMap[edge.getDestination()] {
+                    neighborColors.insert(c)
+                }
+            }
+
+            // Find the smallest positive color not used by neighbors
+            var color = 1
+            while neighborColors.contains(color) {
+                color += 1
+            }
+            colorMap[vertex] = color
+        }
+
+        return colorMap
+    }
+}
+
+// Demo with 1-based vertices (consistent with other code in your file)
+func demoGraphColoringOneBased() {
+    // Map Java’s 0..5 to 1..6 for consistency
+    let graph = WeightedGraph(vertices: 6)
+    graph.addUndirectedEdge(source: 1, destination: 2, weight: 4)
+    graph.addUndirectedEdge(source: 1, destination: 3, weight: 4)
+    graph.addUndirectedEdge(source: 2, destination: 3, weight: 2)
+    graph.addUndirectedEdge(source: 3, destination: 4, weight: 3)
+    graph.addUndirectedEdge(source: 3, destination: 5, weight: 6)
+    graph.addUndirectedEdge(source: 3, destination: 6, weight: 1)
+    graph.addUndirectedEdge(source: 4, destination: 5, weight: 2)
+    graph.addUndirectedEdge(source: 6, destination: 5, weight: 3)
+
+    let gc = GraphColoring()
+    let colorMap = gc.colorGraph(graph: graph)
+
+    print("Node colors:")
+    var maxColor = 0
+    for vertex in 1...graph.vertices {
+        if let color = colorMap[vertex] {
+            maxColor = max(maxColor, color)
+            print("Node \(vertex) -> Color \(color)")
+        }
+    }
+    print("Minimum number of colors used: \(maxColor)")
+}

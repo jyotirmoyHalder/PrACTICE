@@ -18,6 +18,8 @@ struct ContentView: View {
         .padding()
         .onAppear(){
             printWeightedGraph()
+            print("break")
+            demoDijkstra()
         }
     }
 }
