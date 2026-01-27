@@ -14,13 +14,16 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+                .font(.largeTitle)
+                .foregroundStyle(.green)
             greetings()
         }
         .padding()
+        .foregroundStyle(.red)
     }
     
     @ViewBuilder
-    func greetings() -> TupleView<(Image, Text, Circle)> {
+    func greetings() -> TupleView<(Image, Text , Circle)> {
         Image(systemName: "globe")
         Text("Greetings!")
         Circle()
