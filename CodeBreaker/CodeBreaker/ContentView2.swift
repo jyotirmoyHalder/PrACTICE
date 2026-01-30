@@ -24,26 +24,11 @@ struct ContentView2: View {
                     .aspectRatio(1, contentMode: .fit)
                     .foregroundStyle(colors[index])
             }
-            MatchMarkers()
+            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
         }
     }
 }
 
-
-struct MatchMarkers: View {
-    var body: some View {
-        HStack {
-            VStack {
-                Circle().fill(Color.green)
-                Circle().strokeBorder(Color.primary , lineWidth: 3).aspectRatio(1, contentMode: .fit)
-            }
-            VStack {
-                Circle()
-                Circle().opacity(0)
-            }
-        }
-    }
-}
 #Preview {
     ContentView2()
 }
